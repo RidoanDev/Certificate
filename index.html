@@ -59,20 +59,10 @@
             margin-top: 20px;
             text-align: center;
         }
-        #tokenContainer {
-            display: none;
-            margin-top: 20px;
-            text-align: center;
-        }
         #formFrame {
             width: 100%;
             height: 500px;
             border: none;
-        }
-        .info {
-            color: #e74c3c;
-            font-weight: bold;
-            margin: 10px 0;
         }
     </style>
 </head>
@@ -87,28 +77,13 @@
         
         <div id="formContainer">
             <h2>দয়া করে ফর্মটি পূরণ করুন</h2>
-            <p class="info">ফর্ম সাবমিট করার পর আপনি একটি ইউনিক টোকেন পাবেন। সেটি নিচের বক্সে লিখুন।</p>
             <iframe id="formFrame" src="about:blank"></iframe>
-            <button onclick="showTokenInput()">ফর্ম সাবমিট করেছি, টোকেন লিখুন</button>
-        </div>
-        
-        <div id="tokenContainer">
-            <h2>টোকেন যাচাই করুন</h2>
-            <p class="info">ফর্ম জমা দেওয়ার পর আপনি যে টোকেন পেয়েছেন তা নিচে লিখুন</p>
-            <input type="text" id="tokenInput" placeholder="আপনার ইউনিক টোকেন লিখুন">
-            <button onclick="verifyToken()">টোকেন যাচাই করুন</button>
-            <p id="tokenError" style="color: red; display: none;">ভুল টোকেন! দয়া করে সঠিক টোকেন লিখুন।</p>
+            <button onclick="checkFormSubmission()">ফর্ম সাবমিট করেছি, সার্টিফিকেট ডাউনলোড করুন</button>
         </div>
     </div>
 
     <script>
         let userName = '';
-        let generatedToken = '';
-        
-        function generateUniqueToken() {
-            // Generate a random 8-character alphanumeric token
-            return Math.random().toString(36).substr(2, 8).toUpperCase();
-        }
         
         function openForm() {
             userName = document.getElementById('userName').value.trim();
@@ -118,37 +93,19 @@
                 return;
             }
             
-            // Generate a unique token for this session
-            generatedToken = generateUniqueToken();
-            
             // Show the form
             document.getElementById('formContainer').style.display = 'block';
-            
-            // Load Google Form with the token as a hidden field (you would need to set this up in your Google Form)
-            // Note: This requires setting up your Google Form to collect this token
-            document.getElementById('formFrame').src = `https://docs.google.com/forms/d/e/1FAIpQLSd2mTY3mfh8-C2BBtcXAVbcu7DkUstyVoH1SeeVxsPZjHiI0Q/viewform?entry.1234567890=${generatedToken}&embedded=true`;
+            document.getElementById('formFrame').src = 'https://docs.google.com/forms/d/e/1FAIpQLSd2mTY3mfh8-C2BBtcXAVbcu7DkUstyVoH1SeeVxsPZjHiI0Q/viewform?embedded=true';
             
             // Scroll to form
             document.getElementById('formContainer').scrollIntoView();
         }
         
-        function showTokenInput() {
-            // Hide form and show token input
-            document.getElementById('formContainer').style.display = 'none';
-            document.getElementById('tokenContainer').style.display = 'block';
-            document.getElementById('tokenContainer').scrollIntoView();
-        }
-        
-        function verifyToken() {
-            const enteredToken = document.getElementById('tokenInput').value.trim().toUpperCase();
-            const tokenError = document.getElementById('tokenError');
-            
-            if (enteredToken === generatedToken) {
-                tokenError.style.display = 'none';
-                generateCertificate();
-            } else {
-                tokenError.style.display = 'block';
-            }
+        function checkFormSubmission() {
+            // In a real implementation, you would need to check if the form was actually submitted
+            // Since we can't directly check Google Form submission from client-side,
+            // we'll proceed with certificate generation after this button is clicked
+            generateCertificate();
         }
         
         async function generateCertificate() {
@@ -189,8 +146,8 @@
                 link.download = `${userName}_Blood_Donation_Certificate.pdf`;
                 link.click();
                 
-                // Hide the token container after download
-                document.getElementById('tokenContainer').style.display = 'none';
+                // Hide the form after download
+                document.getElementById('formContainer').style.display = 'none';
                 
             } catch (error) {
                 console.error('ত্রুটি:', error);
