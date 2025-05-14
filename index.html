@@ -23,7 +23,7 @@
             color: #e74c3c;
             text-align: center;
         }
-        input[type="text"], input[type="password"] {
+        input[type="text"] {
             width: 100%;
             padding: 12px;
             margin: 15px 0;
@@ -54,53 +54,63 @@
             text-align: center;
             display: none;
         }
-        .error {
-            color: #e74c3c;
-            font-size: 14px;
-            margin-top: -10px;
-            margin-bottom: 10px;
+        #formContainer {
             display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+        #formFrame {
+            width: 100%;
+            height: 500px;
+            border: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1> বগুড়া অনলাইন রক্তদান সংগঠন সার্টিফিকেট</h1>
+        <h1>বগুড়া অনলাইন রক্তদান সংগঠন সার্টিফিকেট</h1>
         <input type="text" id="userName" placeholder="আপনার পুরো নাম লিখুন">
-        <input type="password" id="password" placeholder="গোপন পাসওয়ার্ড লিখুন">
-        <div id="passwordError" class="error">ভুল পাসওয়ার্ড! দয়া করে সঠিক পাসওয়ার্ড লিখুন।</div>
-        <button id="generateBtn" onclick="validatePassword()">সার্টিফিকেট ডাউনলোড করুন</button>
+        <button id="generateBtn" onclick="openForm()">সার্টিফিকেট ডাউনলোড করুন</button>
         <div class="preview" id="preview">
             <p>আপনার সার্টিফিকেট তৈরি হচ্ছে...</p>
+        </div>
+        
+        <div id="formContainer">
+            <h2>দয়া করে ফর্মটি পূরণ করুন</h2>
+            <iframe id="formFrame" src="about:blank"></iframe>
+            <button onclick="checkFormSubmission()">ফর্ম সাবমিট করেছি, সার্টিফিকেট ডাউনলোড করুন</button>
         </div>
     </div>
 
     <script>
-        // Set your secret password here
-        const SECRET_PASSWORD = "••••••••••";
+        let userName = '';
         
-        function validatePassword() {
-            const password = document.getElementById('password').value.trim();
-            const errorElement = document.getElementById('passwordError');
-            
-            if (password !== SECRET_PASSWORD) {
-                errorElement.style.display = 'block';
-                return;
-            }
-            
-            errorElement.style.display = 'none';
-            generateCertificate();
-        }
-        
-        async function generateCertificate() {
-            const userName = document.getElementById('userName').value.trim();
-            const button = document.getElementById('generateBtn');
-            const preview = document.getElementById('preview');
+        function openForm() {
+            userName = document.getElementById('userName').value.trim();
             
             if (!userName) {
                 alert('দয়া করে আপনার নাম লিখুন');
                 return;
             }
+            
+            // Show the form
+            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('formFrame').src = 'https://docs.google.com/forms/d/e/1FAIpQLSd2mTY3mfh8-C2BBtcXAVbcu7DkUstyVoH1SeeVxsPZjHiI0Q/viewform?embedded=true';
+            
+            // Scroll to form
+            document.getElementById('formContainer').scrollIntoView();
+        }
+        
+        function checkFormSubmission() {
+            // In a real implementation, you would need to check if the form was actually submitted
+            // Since we can't directly check Google Form submission from client-side,
+            // we'll proceed with certificate generation after this button is clicked
+            generateCertificate();
+        }
+        
+        async function generateCertificate() {
+            const button = document.getElementById('generateBtn');
+            const preview = document.getElementById('preview');
             
             button.disabled = true;
             button.textContent = 'তৈরি হচ্ছে...';
@@ -135,6 +145,9 @@
                 link.href = URL.createObjectURL(blob);
                 link.download = `${userName}_Blood_Donation_Certificate.pdf`;
                 link.click();
+                
+                // Hide the form after download
+                document.getElementById('formContainer').style.display = 'none';
                 
             } catch (error) {
                 console.error('ত্রুটি:', error);
