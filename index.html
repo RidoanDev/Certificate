@@ -59,10 +59,16 @@
             margin-top: 20px;
             text-align: center;
         }
-        #formFrame {
-            width: 100%;
-            height: 500px;
-            border: none;
+        .instructions {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #e74c3c;
+        }
+        #confirmationCheck {
+            margin-top: 20px;
+            display: none;
         }
     </style>
 </head>
@@ -70,20 +76,30 @@
     <div class="container">
         <h1>বগুড়া অনলাইন রক্তদান সংগঠন সার্টিফিকেট</h1>
         <input type="text" id="userName" placeholder="আপনার পুরো নাম লিখুন">
-        <button id="generateBtn" onclick="openForm()">পরের ধাপে এগিয়ে যান</button>
-        <div class="preview" id="preview">
-            <p>আপনার সার্টিফিকেট তৈরি হচ্ছে...</p>
-        </div>
+        <button id="openFormBtn" onclick="openForm()">ফর্ম পূরণ করতে এখানে ক্লিক করুন</button>
         
         <div id="formContainer">
-            <h2>দয়া করে নিচের ফর্মটি পূরণ করে 'Submit' বাটনে ক্লিক করুন তারপর 'ডাউনলোড করুন'</h2>
-            <iframe id="formFrame" src="about:blank"></iframe>
-            <button onclick="checkFormSubmission()">ফর্ম সাবমিট করেছি, সার্টিফিকেট ডাউনলোড করুন</button>
+            <div class="instructions">
+                <p>দয়া করে Google Form পূরণ করুন এবং সাবমিট করুন। ফর্ম সাবমিট করার পর এই পৃষ্ঠায় ফিরে আসুন।</p>
+                <p>ফর্ম সাবমিট করার পর নিচের বাটনে ক্লিক করে আপনার সার্টিফিকেট ডাউনলোড করুন।</p>
+            </div>
+            
+            <div id="confirmationCheck">
+                <input type="checkbox" id="formSubmitted" onchange="toggleDownloadButton()">
+                <label for="formSubmitted">আমি Google Form সফলভাবে সাবমিট করেছি</label>
+            </div>
+            
+            <button id="downloadBtn" onclick="generateCertificate()" disabled>সার্টিফিকেট ডাউনলোড করুন</button>
+        </div>
+        
+        <div class="preview" id="preview">
+            <p>আপনার সার্টিফিকেট তৈরি হচ্ছে...</p>
         </div>
     </div>
 
     <script>
         let userName = '';
+        let formWindow = null;
         
         function openForm() {
             userName = document.getElementById('userName').value.trim();
@@ -93,23 +109,27 @@
                 return;
             }
             
-            // Show the form
+            // Show the form container and instructions
             document.getElementById('formContainer').style.display = 'block';
-            document.getElementById('formFrame').src = 'https://docs.google.com/forms/d/e/1FAIpQLSd2mTY3mfh8-C2BBtcXAVbcu7DkUstyVoH1SeeVxsPZjHiI0Q/viewform?embedded=true';
+            document.getElementById('confirmationCheck').style.display = 'block';
             
-            // Scroll to form
+            // Open Google Form in a new tab/window
+            formWindow = window.open('https://docs.google.com/forms/d/e/1FAIpQLSd2mTY3mfh8-C2BBtcXAVbcu7DkUstyVoH1SeeVxsPZjHiI0Q/viewform', '_blank');
+            
+            // Scroll to form container
             document.getElementById('formContainer').scrollIntoView();
+            
+            // Disable the open form button
+            document.getElementById('openFormBtn').disabled = true;
         }
         
-        function checkFormSubmission() {
-            // In a real implementation, you would need to check if the form was actually submitted
-            // Since we can't directly check Google Form submission from client-side,
-            // we'll proceed with certificate generation after this button is clicked
-            generateCertificate();
+        function toggleDownloadButton() {
+            const isChecked = document.getElementById('formSubmitted').checked;
+            document.getElementById('downloadBtn').disabled = !isChecked;
         }
         
         async function generateCertificate() {
-            const button = document.getElementById('generateBtn');
+            const button = document.getElementById('downloadBtn');
             const preview = document.getElementById('preview');
             
             button.disabled = true;
@@ -145,9 +165,6 @@
                 link.href = URL.createObjectURL(blob);
                 link.download = `${userName}_Blood_Donation_Certificate.pdf`;
                 link.click();
-                
-                // Hide the form after download
-                document.getElementById('formContainer').style.display = 'none';
                 
             } catch (error) {
                 console.error('ত্রুটি:', error);
