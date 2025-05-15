@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
     <title>বগুড়া অনলাইন রক্তদান সংগঠন</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js" integrity="sha512-ACgERxZK1uW4CgMx1W1qLzRqZxZ5X4Qv6JfT9Q6R7ZgA3JgZlP9+JwJ8JQJ7YOhQ+XZ7JYp+Jk+1h1bKu5J5A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -77,7 +78,7 @@
         
         <div id="formContainer">
             <h2>দয়া করে নিচের ফর্মটি পূরণ করে 'Submit' বাটনে ক্লিক করুন তারপর 'ডাউনলোড করুন'</h2>
-            <iframe id="formFrame" src="about:blank"></iframe>
+            <iframe id="formFrame" src="https://docs.google.com/forms/d/e/1FAIpQLSd2mTY3mfh8-C2BBtcXAVbcu7DkUstyVoH1SeeVxsPZjHiI0Q/viewform?embedded=true"></iframe>
             <button onclick="checkFormSubmission()">ফর্ম সাবমিট করেছি, সার্টিফিকেট ডাউনলোড করুন</button>
         </div>
     </div>
@@ -95,10 +96,9 @@
             
             // Show the form
             document.getElementById('formContainer').style.display = 'block';
-            document.getElementById('formFrame').src = 'https://docs.google.com/forms/d/e/1FAIpQLSd2mTY3mfh8-C2BBtcXAVbcu7DkUstyVoH1SeeVxsPZjHiI0Q/viewform?embedded=true';
             
             // Scroll to form
-            document.getElementById('formContainer').scrollIntoView();
+            document.getElementById('formContainer').scrollIntoView({behavior: 'smooth'});
         }
         
         function checkFormSubmission() {
@@ -118,7 +118,10 @@
             
             try {
                 // টেমপ্লেট PDF লোড করুন
-                const pdfBytes = await fetch('Certificate.pdf').then(res => res.arrayBuffer());
+                const pdfBytes = await fetch('Certificate.pdf').then(res => {
+                    if (!res.ok) throw new Error('Failed to load certificate template');
+                    return res.arrayBuffer();
+                });
                 const { PDFDocument, rgb } = PDFLib;
                 const pdfDoc = await PDFDocument.load(pdfBytes);
                 const page = pdfDoc.getPages()[0];
